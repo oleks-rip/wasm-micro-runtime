@@ -4010,7 +4010,15 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
             }
 
             /* constant instructions */
+#ifdef ENABLE_FLOAT_POINT
             HANDLE_OP(WASM_OP_F64_CONST)
+#else
+            HANDLE_OP(WASM_OP_F64_CONST)
+            {
+                wasm_set_exception(module, "opcode disabled");
+                goto got_exception;
+            }
+#endif
             HANDLE_OP(WASM_OP_I64_CONST)
             {
                 uint8 *orig_ip = frame_ip;
@@ -4023,7 +4031,15 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
                 HANDLE_OP_END();
             }
 
+#ifdef ENABLE_FLOAT_POINT
             HANDLE_OP(WASM_OP_F32_CONST)
+#else
+            HANDLE_OP(WASM_OP_F32_CONST)
+            {
+                wasm_set_exception(module, "opcode disabled");
+                goto got_exception;
+            }
+#endif
             HANDLE_OP(WASM_OP_I32_CONST)
             {
                 uint8 *orig_ip = frame_ip;
@@ -4170,6 +4186,8 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
                 HANDLE_OP_END();
             }
 
+#ifdef ENABLE_FLOAT_POINT
+
             /* comparison instructions of f32 */
             HANDLE_OP(WASM_OP_F32_EQ)
             {
@@ -4243,6 +4261,24 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
                 DEF_OP_CMP(float64, F64, >=);
                 HANDLE_OP_END();
             }
+#else
+            HANDLE_OP(WASM_OP_F32_EQ)
+            HANDLE_OP(WASM_OP_F32_NE)
+            HANDLE_OP(WASM_OP_F32_LT)
+            HANDLE_OP(WASM_OP_F32_GT)
+            HANDLE_OP(WASM_OP_F32_LE)
+            HANDLE_OP(WASM_OP_F32_GE)
+            HANDLE_OP(WASM_OP_F64_EQ)
+            HANDLE_OP(WASM_OP_F64_NE)
+            HANDLE_OP(WASM_OP_F64_LT)
+            HANDLE_OP(WASM_OP_F64_GT)
+            HANDLE_OP(WASM_OP_F64_LE)
+            HANDLE_OP(WASM_OP_F64_GE)
+            {
+                wasm_set_exception(module, "opcode disabled");
+                goto got_exception;
+            }
+#endif
 
             /* numeric instructions of i32 */
             HANDLE_OP(WASM_OP_I32_CLZ)
@@ -4571,6 +4607,8 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
                 HANDLE_OP_END();
             }
 
+#ifdef ENABLE_FLOAT_POINT
+
             /* numeric instructions of f32 */
             HANDLE_OP(WASM_OP_F32_ABS)
             {
@@ -4782,6 +4820,43 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
                 HANDLE_OP_END();
             }
 
+#else
+
+            HANDLE_OP(WASM_OP_F32_ABS)
+            HANDLE_OP(WASM_OP_F32_NEG)
+            HANDLE_OP(WASM_OP_F32_CEIL)
+            HANDLE_OP(WASM_OP_F32_FLOOR)
+            HANDLE_OP(WASM_OP_F32_TRUNC)
+            HANDLE_OP(WASM_OP_F32_NEAREST)
+            HANDLE_OP(WASM_OP_F32_SQRT)
+            HANDLE_OP(WASM_OP_F32_ADD)
+            HANDLE_OP(WASM_OP_F32_SUB)
+            HANDLE_OP(WASM_OP_F32_MUL)
+            HANDLE_OP(WASM_OP_F32_DIV)
+            HANDLE_OP(WASM_OP_F32_MIN)
+            HANDLE_OP(WASM_OP_F32_MAX)
+            HANDLE_OP(WASM_OP_F32_COPYSIGN)
+            HANDLE_OP(WASM_OP_F64_ABS)
+            HANDLE_OP(WASM_OP_F64_NEG)
+            HANDLE_OP(WASM_OP_F64_CEIL)
+            HANDLE_OP(WASM_OP_F64_FLOOR)
+            HANDLE_OP(WASM_OP_F64_TRUNC)
+            HANDLE_OP(WASM_OP_F64_NEAREST)
+            HANDLE_OP(WASM_OP_F64_SQRT)
+            HANDLE_OP(WASM_OP_F64_ADD)
+            HANDLE_OP(WASM_OP_F64_SUB)
+            HANDLE_OP(WASM_OP_F64_MUL)
+            HANDLE_OP(WASM_OP_F64_DIV)
+            HANDLE_OP(WASM_OP_F64_MIN)
+            HANDLE_OP(WASM_OP_F64_MAX)
+            HANDLE_OP(WASM_OP_F64_COPYSIGN)
+            {
+                wasm_set_exception(module, "opcode disabled");
+                goto got_exception;
+            }
+
+#endif //ENABLE_FLOAT_POINT
+
             /* conversions of i32 */
             HANDLE_OP(WASM_OP_I32_WRAP_I64)
             {
@@ -4790,6 +4865,8 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
                 HANDLE_OP_END();
             }
 
+
+#ifdef ENABLE_FLOAT_POINT
             HANDLE_OP(WASM_OP_I32_TRUNC_S_F32)
             {
                 /* We don't use INT32_MIN/INT32_MAX/UINT32_MIN/UINT32_MAX,
@@ -4819,6 +4896,19 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
                 HANDLE_OP_END();
             }
 
+#else
+
+            HANDLE_OP(WASM_OP_I32_TRUNC_S_F32)
+            HANDLE_OP(WASM_OP_I32_TRUNC_U_F32)
+            HANDLE_OP(WASM_OP_I32_TRUNC_S_F64)
+            HANDLE_OP(WASM_OP_I32_TRUNC_U_F64)
+            {
+                wasm_set_exception(module, "opcode disabled");
+                goto got_exception;
+            }
+
+#endif //ENABLE_FLOAT_POINT
+
             /* conversions of i64 */
             HANDLE_OP(WASM_OP_I64_EXTEND_S_I32)
             {
@@ -4831,6 +4921,8 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
                 DEF_OP_CONVERT(int64, I64, uint32, I32);
                 HANDLE_OP_END();
             }
+
+#ifdef ENABLE_FLOAT_POINT
 
             HANDLE_OP(WASM_OP_I64_TRUNC_S_F32)
             {
@@ -4934,6 +5026,32 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
                 DEF_OP_REINTERPRET(int64, I64);
                 HANDLE_OP_END();
             }
+
+#else
+            HANDLE_OP(WASM_OP_I64_TRUNC_S_F32)
+            HANDLE_OP(WASM_OP_I64_TRUNC_U_F32)
+            HANDLE_OP(WASM_OP_I64_TRUNC_S_F64)
+            HANDLE_OP(WASM_OP_I64_TRUNC_U_F64)
+            HANDLE_OP(WASM_OP_F32_CONVERT_S_I32)
+            HANDLE_OP(WASM_OP_F32_CONVERT_U_I32)
+            HANDLE_OP(WASM_OP_F32_CONVERT_S_I64)
+            HANDLE_OP(WASM_OP_F32_CONVERT_U_I64)
+            HANDLE_OP(WASM_OP_F32_DEMOTE_F64)
+            HANDLE_OP(WASM_OP_F64_CONVERT_S_I32)
+            HANDLE_OP(WASM_OP_F64_CONVERT_U_I32)
+            HANDLE_OP(WASM_OP_F64_CONVERT_S_I64)
+            HANDLE_OP(WASM_OP_F64_CONVERT_U_I64)
+            HANDLE_OP(WASM_OP_F64_PROMOTE_F32)
+            HANDLE_OP(WASM_OP_I32_REINTERPRET_F32)
+            HANDLE_OP(WASM_OP_F32_REINTERPRET_I32)
+            HANDLE_OP(WASM_OP_I64_REINTERPRET_F64)
+            HANDLE_OP(WASM_OP_F64_REINTERPRET_I64)
+            {
+                wasm_set_exception(module, "opcode disabled");
+                goto got_exception;
+            }
+
+#endif //ENABLE_FLOAT_POINT
 
             HANDLE_OP(EXT_OP_COPY_STACK_TOP)
             {
@@ -5106,6 +5224,8 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
             {
                 GET_OPCODE();
                 switch (opcode) {
+
+#ifdef ENABLE_FLOAT_POINT
                     case WASM_OP_I32_TRUNC_SAT_S_F32:
                         DEF_OP_TRUNC_SAT_F32(-2147483904.0f, 2147483648.0f,
                                              true, true);
@@ -5138,6 +5258,9 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
                         DEF_OP_TRUNC_SAT_F64(-1.0, 18446744073709551616.0,
                                              false, false);
                         break;
+
+#endif
+
 #if WASM_ENABLE_BULK_MEMORY != 0
                     case WASM_OP_MEMORY_INIT:
                     {
