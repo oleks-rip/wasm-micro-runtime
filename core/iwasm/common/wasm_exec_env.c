@@ -86,7 +86,7 @@ wasm_exec_env_create_internal(struct WASMModuleInstanceCommon *module_inst,
 #endif
 
 #if WASM_ENABLE_INSTRUCTION_METERING != 0
-    exec_env->instructions_to_execute = -1;
+    exec_env->instructions_to_execute = INT64_MAX;
 #endif
 
     return exec_env;

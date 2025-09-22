@@ -1876,7 +1876,14 @@ wasm_runtime_set_native_stack_boundary(wasm_exec_env_t exec_env,
  */
 WASM_RUNTIME_API_EXTERN void
 wasm_runtime_set_instruction_count_limit(wasm_exec_env_t exec_env,
-                                         int instruction_count);
+                                         int64_t instruction_count);
+
+WASM_RUNTIME_API_EXTERN int64_t
+wasm_runtime_get_instruction_count_limit(wasm_exec_env_t exec_env);
+
+WASM_RUNTIME_API_EXTERN void
+wasm_runtime_set_instruction_schedule(wasm_exec_env_t exec_env,
+                                      int64_t const *instructions_schedule);
 
 /**
  * Dump runtime memory consumption, including:

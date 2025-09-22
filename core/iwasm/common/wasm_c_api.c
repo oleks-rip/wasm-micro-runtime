@@ -5389,3 +5389,8 @@ wasm_instance_get_wasm_func_exec_time(const wasm_instance_t *instance,
     return -1.0;
 #endif
 }
+
+wasm_exec_env_t wasm_instance_exec_env(const wasm_instance_t *instance)
+{
+    return wasm_runtime_get_exec_env_singleton(instance->inst_comm_rt);
+}

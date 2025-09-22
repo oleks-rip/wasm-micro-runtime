@@ -833,7 +833,10 @@ wasm_runtime_set_native_stack_boundary(WASMExecEnv *exec_env,
 /* See wasm_export.h for description */
 WASM_RUNTIME_API_EXTERN void
 wasm_runtime_set_instruction_count_limit(WASMExecEnv *exec_env,
-                                         int instructions_to_execute);
+                                         int64 instructions_to_execute);
+WASM_RUNTIME_API_EXTERN int64
+wasm_runtime_get_instruction_count_limit(WASMExecEnv *exec_env);
+
 #endif
 
 #if WASM_CONFIGURABLE_BOUNDS_CHECKS != 0

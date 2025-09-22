@@ -90,14 +90,14 @@ typedef float64 CellType_F64;
     } while (0)
 
 #if WASM_ENABLE_INSTRUCTION_METERING != 0
-#define CHECK_INSTRUCTION_LIMIT()                                 \
-    if (instructions_left == 0) {                                 \
-        wasm_set_exception(module, "instruction limit exceeded"); \
-        goto got_exception;                                       \
-    }                                                             \
-    else if (instructions_left > 0)                               \
-        instructions_left--;
-
+#define CHECK_INSTRUCTION_LIMIT()                                     \
+    do {                                                              \
+        --instructions_left;                                          \
+        if (instructions_left < 0) {                                  \
+            wasm_set_exception(module, "instruction limit exceeded"); \
+            goto got_exception;                                       \
+        }                                                             \
+    } while (0)
 #else
 #define CHECK_INSTRUCTION_LIMIT() (void)0
 #endif
@@ -1438,7 +1438,6 @@ wasm_interp_dump_op_count()
     do {                                               \
         const void *p_label_addr = *(void **)frame_ip; \
         frame_ip += sizeof(void *);                    \
-        CHECK_INSTRUCTION_LIMIT();                     \
         goto *p_label_addr;                            \
     } while (0)
 #else
@@ -1450,7 +1449,6 @@ wasm_interp_dump_op_count()
         /* int32 relative offset was emitted in 64-bit target */          \
         p_label_addr = label_base + (int32)LOAD_U32_WITH_2U16S(frame_ip); \
         frame_ip += sizeof(int32);                                        \
-        CHECK_INSTRUCTION_LIMIT();                                        \
         goto *p_label_addr;                                               \
     } while (0)
 #else
@@ -1461,17 +1459,18 @@ wasm_interp_dump_op_count()
         /* uint32 label address was emitted in 32-bit target */          \
         p_label_addr = (void *)(uintptr_t)LOAD_U32_WITH_2U16S(frame_ip); \
         frame_ip += sizeof(int32);                                       \
-        CHECK_INSTRUCTION_LIMIT();                                       \
         goto *p_label_addr;                                              \
     } while (0)
 #endif
 #endif /* end of WASM_CPU_SUPPORTS_UNALIGNED_ADDR_ACCESS */
-#define HANDLE_OP_END() FETCH_OPCODE_AND_DISPATCH()
+#define HANDLE_OP_END() CHECK_INSTRUCTION_LIMIT(); FETCH_OPCODE_AND_DISPATCH()
 
 #else /* else of WASM_ENABLE_LABELS_AS_VALUES */
 
 #define HANDLE_OP(opcode) case opcode:
-#define HANDLE_OP_END() continue
+#define HANDLE_OP_END()        \
+    CHECK_INSTRUCTION_LIMIT(); \
+    continue
 
 #endif /* end of WASM_ENABLE_LABELS_AS_VALUES */
 
@@ -1540,10 +1539,9 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
     uint8 opcode = 0, local_type, *global_addr;
 
 #if WASM_ENABLE_INSTRUCTION_METERING != 0
-    int instructions_left = -1;
-    if (exec_env) {
+    int64 instructions_left = INT64_MAX;
+    if (exec_env)
         instructions_left = exec_env->instructions_to_execute;
-    }
 #endif
 #if !defined(OS_ENABLE_HW_BOUND_CHECK) \
     || WASM_CPU_SUPPORTS_UNALIGNED_ADDR_ACCESS == 0
@@ -7784,6 +7782,11 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
         FREE_FRAME(exec_env, frame);
         wasm_exec_env_set_cur_frame(exec_env, (WASMRuntimeFrame *)prev_frame);
 
+#if WASM_ENABLE_INSTRUCTION_METERING != 0
+        if (exec_env)
+            exec_env->instructions_to_execute = instructions_left;
+#endif
+
         if (!prev_frame->ip)
             /* Called from native. */
             return;
@@ -7812,6 +7815,10 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
 
     got_exception:
         SYNC_ALL_TO_FRAME();
+#if WASM_ENABLE_INSTRUCTION_METERING != 0
+        if (exec_env)
+            exec_env->instructions_to_execute = instructions_left;
+#endif
         return;
 
 #if WASM_ENABLE_LABELS_AS_VALUES == 0

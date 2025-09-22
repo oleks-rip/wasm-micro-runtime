@@ -703,6 +703,11 @@ WASM_API_EXTERN double wasm_instance_sum_wasm_exec_time(const wasm_instance_t*);
 // func_name. If the function is not found, return 0.
 WASM_API_EXTERN double wasm_instance_get_wasm_func_exec_time(const wasm_instance_t*, const char *);
 
+struct WASMExecEnv;
+typedef struct WASMExecEnv *wasm_exec_env_t;
+
+WASM_API_EXTERN wasm_exec_env_t wasm_instance_exec_env(const wasm_instance_t*);
+
 ///////////////////////////////////////////////////////////////////////////////
 // Convenience
 

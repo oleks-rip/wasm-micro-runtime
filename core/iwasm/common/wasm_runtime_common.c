@@ -2344,9 +2344,17 @@ wasm_runtime_access_exce_check_guard_page()
 #if WASM_ENABLE_INSTRUCTION_METERING != 0
 void
 wasm_runtime_set_instruction_count_limit(WASMExecEnv *exec_env,
-                                         int instructions_to_execute)
+                                         int64 instructions_to_execute)
 {
+    if(instructions_to_execute == -1)
+        instructions_to_execute = INT64_MAX;
     exec_env->instructions_to_execute = instructions_to_execute;
+}
+
+int64
+wasm_runtime_get_instruction_count_limit(WASMExecEnv *exec_env)
+{
+    return exec_env->instructions_to_execute;
 }
 #endif
 
