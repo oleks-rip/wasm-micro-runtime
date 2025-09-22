@@ -36,7 +36,11 @@ extern "C" {
 #if WASM_ENABLE_UVWASI != 0 || WASM_ENABLE_LIBC_WASI == 0
 #define assert_wasi_layout(expr, message) /* nothing */
 #else
-#define assert_wasi_layout(expr, message) _Static_assert(expr, message)
+    #ifndef _MSC_VER
+        #define assert_wasi_layout(expr, message) _Static_assert(expr, message)
+    #else
+        #define assert_wasi_layout(expr, message) static_assert(expr, message)
+    #endif
 #endif
 
 assert_wasi_layout(_Alignof(int8_t) == 1, "non-wasi data layout");

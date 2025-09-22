@@ -1,7 +1,7 @@
 # Copyright (C) 2019 Intel Corporation.  All rights reserved.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required (VERSION 3.20)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
@@ -170,7 +170,7 @@ if (MINGW)
 endif ()
 
 if (WIN32)
-  target_link_libraries(vmlib PRIVATE ntdll)
+  target_link_libraries(vmlib PUBLIC ntdll)
 endif()
 
 set (WAMR_PUBLIC_HEADERS

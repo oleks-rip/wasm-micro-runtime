@@ -19,8 +19,10 @@
 #if defined(_MSC_BUILD)
 #if defined(COMPILING_WASM_RUNTIME_API)
 #define WASM_API_EXTERN __declspec(dllexport)
-#else
+#elif defined(_DLL)
 #define WASM_API_EXTERN __declspec(dllimport)
+#else
+#define WASM_API_EXTERN
 #endif
 #else
 #define WASM_API_EXTERN

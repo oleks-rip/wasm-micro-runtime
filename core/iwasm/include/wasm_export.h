@@ -20,8 +20,10 @@
 #if defined(_MSC_BUILD)
 #if defined(COMPILING_WASM_RUNTIME_API)
 #define WASM_RUNTIME_API_EXTERN __declspec(dllexport)
-#else
+#elif defined(_DLL)
 #define WASM_RUNTIME_API_EXTERN __declspec(dllimport)
+#else
+#define WASM_RUNTIME_API_EXTERN
 #endif
 #elif defined(__GNUC__) || defined(__clang__)
 #define WASM_RUNTIME_API_EXTERN __attribute__((visibility("default")))
