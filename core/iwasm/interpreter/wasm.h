@@ -617,6 +617,9 @@ typedef struct WASMFunctionImport {
     WASMModule *import_module;
     WASMFunction *import_func_linked;
 #endif
+    // gas cost for import func
+    uint32 gas;
+
 } WASMFunctionImport;
 
 #if WASM_ENABLE_TAGS != 0

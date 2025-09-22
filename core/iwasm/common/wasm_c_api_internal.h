@@ -142,6 +142,10 @@ struct wasm_func_t {
             void (*finalizer)(void *);
         } cb_env;
     } u;
+
+    // gas cost for import func
+    uint32 gas;
+
     /*
      * an index in both functions runtime instance lists
      * of interpreter mode and aot mode

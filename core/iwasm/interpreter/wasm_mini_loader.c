@@ -805,6 +805,7 @@ load_function_import(const uint8 **p_buf, const uint8 *buf_end,
     const char *linked_signature = NULL;
     void *linked_attachment = NULL;
     bool linked_call_conv_raw = false;
+    uint32_t gas = 0;
 
     read_leb_uint32(p, p_end, declare_type_index);
     *p_buf = p;
@@ -816,7 +817,7 @@ load_function_import(const uint8 **p_buf, const uint8 *buf_end,
     /* check built-in modules */
     linked_func = wasm_native_resolve_symbol(
         sub_module_name, function_name, declare_func_type, &linked_signature,
-        &linked_attachment, &linked_call_conv_raw);
+        &linked_attachment, &gas, &linked_call_conv_raw);
 
     function->module_name = (char *)sub_module_name;
     function->field_name = (char *)function_name;
@@ -825,6 +826,7 @@ load_function_import(const uint8 **p_buf, const uint8 *buf_end,
     function->signature = linked_signature;
     function->attachment = linked_attachment;
     function->call_conv_raw = linked_call_conv_raw;
+    function->gas = gas;
     return true;
 }
 

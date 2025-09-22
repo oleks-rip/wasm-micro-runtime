@@ -7670,6 +7670,7 @@ wasm_interp_call_func_bytecode(WASMModuleInstance *module,
             {
                 wasm_interp_call_func_native(module, exec_env, cur_func,
                                              prev_frame);
+                instructions_left -= cur_func->gas;
             }
 
 #if WASM_ENABLE_TAIL_CALL != 0 || WASM_ENABLE_GC != 0

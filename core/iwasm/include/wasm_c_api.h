@@ -594,6 +594,8 @@ WASM_API_EXTERN size_t wasm_func_result_arity(const wasm_func_t*);
 WASM_API_EXTERN own wasm_trap_t* wasm_func_call(
   const wasm_func_t*, const wasm_val_vec_t* args, wasm_val_vec_t* results);
 
+WASM_API_EXTERN own uint32_t wasm_func_set_gas(wasm_func_t*, uint32_t);
+
 
 // Global Instances
 

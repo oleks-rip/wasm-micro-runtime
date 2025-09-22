@@ -237,6 +237,10 @@ struct WASMFunctionInstance {
         WASMFunctionImport *func_import;
         WASMFunction *func;
     } u;
+
+    // gas cost for import func
+    uint32 gas;
+
 #if WASM_ENABLE_MULTI_MODULE != 0
     WASMModuleInstance *import_module_inst;
     WASMFunctionInstance *import_func_inst;

@@ -168,7 +168,7 @@ wasm_resolve_import_func(const WASMModule *module, WASMFunctionImport *function)
 #endif
     function->func_ptr_linked = wasm_native_resolve_symbol(
         function->module_name, function->field_name, function->func_type,
-        &function->signature, &function->attachment, &function->call_conv_raw);
+        &function->signature, &function->attachment, &function->gas, &function->call_conv_raw);
 
     if (function->func_ptr_linked) {
         return true;
@@ -820,6 +820,7 @@ functions_instantiate(const WASMModule *module, WASMModuleInstance *module_inst,
         function->param_count =
             (uint16)function->u.func_import->func_type->param_count;
         function->param_types = function->u.func_import->func_type->types;
+        function->gas = import->u.function.gas;
         function->local_cell_num = 0;
         function->local_count = 0;
         function->local_types = NULL;

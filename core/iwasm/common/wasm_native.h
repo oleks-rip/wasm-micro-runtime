@@ -52,7 +52,7 @@ wasm_native_lookup_libc_builtin_global(const char *module_name,
 void *
 wasm_native_resolve_symbol(const char *module_name, const char *field_name,
                            const WASMFuncType *func_type,
-                           const char **p_signature, void **p_attachment,
+                           const char **p_signature, void **p_attachment, uint32_t *gas,
                            bool *p_call_conv_raw);
 
 bool

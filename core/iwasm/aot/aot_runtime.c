@@ -5611,7 +5611,7 @@ aot_resolve_import_func(AOTModule *module, AOTImportFunc *import_func)
     import_func->func_ptr_linked = wasm_native_resolve_symbol(
         import_func->module_name, import_func->func_name,
         import_func->func_type, &import_func->signature,
-        &import_func->attachment, &import_func->call_conv_raw);
+        &import_func->attachment, NULL, &import_func->call_conv_raw);
 #if WASM_ENABLE_MULTI_MODULE != 0
     if (!import_func->func_ptr_linked) {
         if (!wasm_runtime_is_built_in_module(import_func->module_name)) {

@@ -180,9 +180,9 @@ native_symbol_cmp(const void *native_symbol1, const void *native_symbol2)
                   ((const NativeSymbol *)native_symbol2)->symbol);
 }
 
-static void *
+static NativeSymbol *
 lookup_symbol(NativeSymbol *native_symbols, uint32 n_native_symbols,
-              const char *symbol, const char **p_signature, void **p_attachment)
+              const char *symbol)
 {
     NativeSymbol *native_symbol, key = { 0 };
 
@@ -190,9 +190,7 @@ lookup_symbol(NativeSymbol *native_symbols, uint32 n_native_symbols,
 
     if ((native_symbol = bsearch(&key, native_symbols, n_native_symbols,
                                  sizeof(NativeSymbol), native_symbol_cmp))) {
-        *p_signature = native_symbol->signature;
-        *p_attachment = native_symbol->attachment;
-        return native_symbol->func_ptr;
+        return native_symbol;
     }
 
     return NULL;
@@ -205,25 +203,36 @@ lookup_symbol(NativeSymbol *native_symbols, uint32 n_native_symbols,
 void *
 wasm_native_resolve_symbol(const char *module_name, const char *field_name,
                            const WASMFuncType *func_type,
-                           const char **p_signature, void **p_attachment,
+                           const char **p_signature, void **p_attachment, uint32_t *gas,
                            bool *p_call_conv_raw)
 {
     NativeSymbolsNode *node, *node_next;
     const char *signature = NULL;
     void *func_ptr = NULL, *attachment = NULL;
+    NativeSymbol *native_symbol = NULL;
 
     node = g_native_symbols_list;
     while (node) {
         node_next = node->next;
         if (!strcmp(node->module_name, module_name)) {
-            if ((func_ptr =
+            if ((native_symbol =
                      lookup_symbol(node->native_symbols, node->n_native_symbols,
-                                   field_name, &signature, &attachment))
+                                   field_name))
                 || (field_name[0] == '_'
-                    && (func_ptr = lookup_symbol(
+                    && (native_symbol = lookup_symbol(
                             node->native_symbols, node->n_native_symbols,
-                            field_name + 1, &signature, &attachment))))
-                break;
+                            field_name + 1))))
+            {
+                func_ptr = native_symbol->func_ptr;
+                if(func_ptr)
+                {
+                    if(gas)
+                        *gas = native_symbol->gas;
+                    signature = native_symbol->signature;
+                    attachment = native_symbol->attachment;
+                    break;
+                }
+            }
         }
         node = node_next;
     }

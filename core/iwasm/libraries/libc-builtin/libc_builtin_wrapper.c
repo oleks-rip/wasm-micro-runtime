@@ -1038,16 +1038,16 @@ print_f64_wrapper(wasm_exec_env_t exec_env, double f64)
 
 /* clang-format off */
 #define REG_NATIVE_FUNC(func_name, signature) \
-    { #func_name, func_name##_wrapper, signature, NULL }
+    { #func_name, func_name##_wrapper, signature, NULL, 0 }
 /* clang-format on */
 
 static NativeSymbol native_symbols_libc_builtin[] = {
     REG_NATIVE_FUNC(printf, "($*)i"),
     REG_NATIVE_FUNC(sprintf, "($$*)i"),
     REG_NATIVE_FUNC(snprintf, "(*~$*)i"),
-    { "vprintf", printf_wrapper, "($*)i", NULL },
-    { "vsprintf", sprintf_wrapper, "($$*)i", NULL },
-    { "vsnprintf", snprintf_wrapper, "(*~$*)i", NULL },
+    { "vprintf", printf_wrapper, "($*)i", NULL, 0 },
+    { "vsprintf", sprintf_wrapper, "($$*)i", NULL, 0 },
+    { "vsnprintf", snprintf_wrapper, "(*~$*)i", NULL, 0 },
     REG_NATIVE_FUNC(puts, "($)i"),
     REG_NATIVE_FUNC(putchar, "(i)i"),
     REG_NATIVE_FUNC(memcmp, "(**~)i"),

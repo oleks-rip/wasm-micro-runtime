@@ -3242,8 +3242,18 @@ wasm_func_copy(const wasm_func_t *func)
 
     cloned->func_idx_rt = func->func_idx_rt;
     cloned->inst_comm_rt = func->inst_comm_rt;
+    cloned->gas = func->gas;
 
     RETURN_OBJ(cloned, wasm_func_delete)
+}
+
+uint32_t
+wasm_func_set_gas(wasm_func_t *func, uint32_t gas)
+{
+    if(!func) return 0;
+
+    func->gas = gas;
+    return gas;
 }
 
 own wasm_functype_t *
@@ -4998,11 +5008,11 @@ wasm_instance_new_with_args_ex(wasm_store_t *store, const wasm_module_t *module,
         goto failed;
     }
 
+    WASMModuleInstance *wasm_module_inst = NULL;
     /* create the c-api func import list */
 #if WASM_ENABLE_INTERP != 0
     if (instance->inst_comm_rt->module_type == Wasm_Module_Bytecode) {
-        WASMModuleInstance *wasm_module_inst =
-            (WASMModuleInstance *)instance->inst_comm_rt;
+        wasm_module_inst = (WASMModuleInstance *)instance->inst_comm_rt;
         p_func_imports = &(wasm_module_inst->c_api_func_imports);
         import_func_count = MODULE_INTERP(module)->import_function_count;
     }
@@ -5051,6 +5061,13 @@ wasm_instance_new_with_args_ex(wasm_store_t *store, const wasm_module_t *module,
             func_import->env_arg = NULL;
         }
         bh_assert(func_import->func_ptr_linked);
+
+        // fill gas
+        if(wasm_module_inst) {
+            WASMFunctionInstance *fi = wasm_module_inst->e->functions + func_host->func_idx_rt;
+            if(fi) fi->gas = func_host->gas;
+        }
+
 
         func_import++;
     }

@@ -24,6 +24,8 @@ typedef struct NativeSymbol {
     /* attachment which can be retrieved in native API by
        calling wasm_runtime_get_function_attachment(exec_env) */
     void *attachment;
+    // gas cost for import func
+    uint32_t gas;
 } NativeSymbol;
 
 /* clang-format off */

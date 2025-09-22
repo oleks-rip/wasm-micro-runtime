@@ -7420,7 +7420,7 @@ wasm_runtime_is_import_func_linked(const char *module_name,
                                    const char *func_name)
 {
     return wasm_native_resolve_symbol(module_name, func_name, NULL, NULL, NULL,
-                                      NULL);
+                                      NULL, NULL);
 }
 
 bool
